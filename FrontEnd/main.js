@@ -96,3 +96,21 @@ function setActiveButton(activeButton) {
 
 // Appelle la fonction principale pour récupérer et afficher les travaux dès le chargement de la page
 getWorks();
+
+
+// ADMIN
+
+function showEditBanner() {
+    if (sessionStorage.token !== undefined) {
+        const editBanner = document.querySelector(".banner-editmode")
+        const header = document.querySelector("header")
+        const editBtn = document.querySelector(".edit-Btn")
+        const loginBtn = document.querySelector(".login-link")
+        editBanner.style.display = 'block';
+        editBtn.style.display = 'inline-block';
+        header.classList.add("mgt-header");
+        loginBtn.textContent = "logout"
+    }
+}
+
+showEditBanner()

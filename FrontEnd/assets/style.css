@@ -46,6 +46,10 @@ table {
 	border-collapse: collapse;
 	border-spacing: 0;
 }
+a {
+	color: inherit;
+	text-decoration: none;
+}
 /** end reset css**/
 body {
 	max-width: 1140px;
@@ -173,7 +177,7 @@ margin: auto;
 #contact h2{
 	margin-bottom: 20px;
 }
-#contact form, .login-form {
+#contact form {
 	text-align: left;
 	margin-top:30px;
 	display: flex;
@@ -224,6 +228,13 @@ footer nav ul {
 	color: #1D6154;
 	font-weight: 700;
 	margin-top: 150px;
+	margin-bottom: 50px;
+}
+
+.login-form {
+	text-align: left;
+	display: flex;
+	flex-direction: column;
 }
 
 .forgetpassword-content {
@@ -233,4 +244,40 @@ footer nav ul {
 
 .forgetpassword {
 	color: #3D3D3D;
+}
+
+/** Banner edit mode **/
+
+.banner-editmode {
+	display: none;
+	position: absolute;
+	max-width: 2000px;
+	background-color: black;
+	color: white;
+	width: 100%;
+	top: 0;
+	left: 0;
+	padding: 20px 0;
+	text-align: center;
+}
+
+.banner-editmode i {
+	margin-right: 15px;
+}
+
+.mgt-header {
+	margin-top: 90px;
+}
+
+.edit-Btn {
+	position: absolute;
+	font-size: 14px;
+	margin-top: 10px;
+	margin-left: 30px;
+	color: black;
+	display: none;
+}
+
+.edit-Btn i {
+	margin-right: 10px;
 }
