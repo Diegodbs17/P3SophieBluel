@@ -14,6 +14,8 @@ async function getWorks() {
         generateFilterButtons(); // Appelle une fonction pour créer dynamiquement les boutons de filtre
         applyFilter("all"); // Affiche les travaux dès le chargement de la page
         setActiveButton(document.querySelector(".btn-all")); // Définit le bouton "Tous" comme actif
+        displayGalleryModal(worksData);
+        addDeleteEventListeners();
     } catch (error) {
         console.error("Erreur lors du chargement des travaux :", error.message); // Affiche l'erreur en console
     }
@@ -21,35 +23,32 @@ async function getWorks() {
 
 // Fonction pour générer dynamiquement les boutons de filtre
 function generateFilterButtons() {
-    const categories = new Set(); // Utilise un Set pour éviter les doublons de catégories
-    categories.add("Tous"); // Ajoute manuellement la catégorie "Tous" pour afficher toutes les travaux
+    const filterContainer = document.querySelector(".filter-container");
+    filterContainer.innerHTML = ""; // Vide le conteneur
 
-    // Parcourt les travaux et ajoute leurs catégories dans le Set
+    const categories = new Set();
+    categories.add("Tous");
+
     worksData.forEach(work => {
-        categories.add(work.category.name); // Ajoute chaque catégorie au Set
+        categories.add(work.category.name);
     });
 
-    const filterContainer = document.querySelector(".filter-container"); // Sélectionne le conteneur des boutons dans le DOM
-
-    // Pour chaque catégorie dans le Set, on crée un bouton
     categories.forEach(category => {
-        const button = document.createElement("button"); // Crée un élément <button>
-        button.textContent = category; // Définit le texte du bouton avec le nom de la catégorie
-        button.classList.add("btn"); // Ajoute une classe "btn" pour appliquer des styles CSS communs
+        const button = document.createElement("button");
+        button.textContent = category;
+        button.classList.add("btn");
 
-        // Si la catégorie est "Tous", on lui donne une classe supplémentaire pour le style
         if (category === "Tous") {
             button.classList.add("btn-all");
         }
 
-        // Ajoute un événement "click" pour appliquer le filtre quand on clique sur le bouton
         button.addEventListener("click", () => {
-            const categoryFilter = category === "Tous" ? "all" : category; // Si c'est "Tous", on filtre avec "all"
-            applyFilter(categoryFilter); // Applique le filtre correspondant
-            setActiveButton(button); // Définit le bouton cliqué comme actif
+            const categoryFilter = category === "Tous" ? "all" : category;
+            applyFilter(categoryFilter);
+            setActiveButton(button);
         });
 
-        filterContainer.appendChild(button); // Ajoute le bouton dans le conteneur
+        filterContainer.appendChild(button);
     });
 }
 
@@ -128,30 +127,54 @@ const openModal = function (e) {
     focusables = Array.from(modal.querySelector(focusableSelector))
     previouslyFocusedElement = document.querySelector(":focus")
     modal.style.display = null
-    // focusables[0].focus()
+    //focusables[0].focus()
     modal.removeAttribute("aria-hidden")
     modal.setAttribute("aria-modal", "true")
     modal.addEventListener("click", closeModal)
-    modal.querySelector(".js-close-modal").addEventListener("click", closeModal)
-    modal.querySelector(".js-modal-stop").addEventListener("click", stopPropagation)
+    modal.querySelectorAll(".js-close-modal").forEach((element) =>
+        element.addEventListener("click", closeModal)
+    );
+    modal.querySelectorAll(".js-modal-stop").forEach((element) =>
+        element.addEventListener("click", stopPropagation)
+    );
+    const modal2 = document.querySelector(".modal-wrapper-2")
+    modal2.style.display = "none"
 }
 
 const closeModal = function (e) {
-    if (modal === null) return
-    if (previouslyFocusedElement !== null) previouslyFocusedElement.focus()
+    if (modal === null || !modal.contains(e.target)) return;
     e.preventDefault()
+    if (previouslyFocusedElement !== null) previouslyFocusedElement.focus()
     modal.setAttribute("aria-hidden", "true")
     modal.removeAttribute("aria-modal")
     modal.removeEventListener("click", closeModal)
-    modal.querySelector(".js-close-modal").removeEventListener("click", closeModal)
-    modal.querySelector(".js-modal-stop").removeEventListener("click", stopPropagation)
+    modal.querySelectorAll(".js-close-modal").forEach((element) =>
+        element.removeEventListener("click", closeModal)
+    );
+    modal.querySelectorAll(".js-modal-stop").forEach((element) =>
+        element.removeEventListener("click", stopPropagation)
+    );
     const hideModal = function () {
         modal.style.display = "none"
         modal.removeEventListener("animationend", hideModal)
         modal = null
     }
     modal.addEventListener("animationend", hideModal)
+    const modal2 = document.querySelector(".modal-wrapper-2")
+    const modal1 = document.querySelector(".modal-wrapper")
+    window.setTimeout(() => {
+        modal2.style.display = "none";
+        modal1.style.display = "block";
+    }, "500");
 }
+
+const deleteBtn = function (e) {
+    e.preventDefault();
+    //clicked button
+    if (e.target.matches(".fa-trash-can")) {
+      deleteWork(e.target.id);
+    }
+  };
 
 const stopPropagation = function (e) {
     e.stopPropagation()
@@ -186,3 +209,99 @@ window.addEventListener("keydown", function (e) {
         focusInModal(e)
     }
 });
+
+
+function displayGalleryModal(works) {
+    const galleryModal = document.querySelector(".galleryModal"); // Sélectionne la galerie dans le DOM
+    galleryModal.innerHTML = ""; // Vide la galerie avant d'afficher de nouvelles travaux
+
+    // Parcourt chaque travaux dans la liste et appelle la fonction createFigure pour l'afficher
+    works.forEach(createFigureModal);
+}
+
+
+function createFigureModal(work) {
+    const galleryModal = document.querySelector(".galleryModal");
+    const figureModal = document.createElement("figure");
+    figureModal.innerHTML = `
+        <img src="${work.imageUrl}" alt="${work.title}">
+        <button type="button" class="btn-trash" data-id="${work.id}">
+            <i class="fa-solid fa-trash-can"></i>
+        </button>
+    `;
+    figureModal.style.position = "relative";
+
+    // Ajout direct de l'événement
+    const deleteButton = figureModal.querySelector(".btn-trash");
+    deleteButton.addEventListener("click", async (e) => {
+        e.preventDefault(); // Important
+        const workId = deleteButton.getAttribute("data-id");
+        console.log("Suppression en cours pour l'ID :", workId);
+        await deleteWork(workId);
+    });
+
+    galleryModal.appendChild(figureModal);
+}
+
+function addDeleteEventListeners() {
+    const deleteButtons = document.querySelectorAll(".btn-trash"); // Sélectionne tous les boutons trash
+    deleteButtons.forEach(button => {
+        button.addEventListener("click", async (event) => {
+            const workId = button.getAttribute("data-id"); // Récupère l'ID depuis l'attribut data-id
+            console.log("Bouton cliqué", workId); // Ajout d'un log ici
+            console.log(`Suppression du projet avec l'ID : ${workId}`);
+            await deleteWork(workId); // Appelle la fonction pour supprimer le projet
+        });
+    });
+}
+
+async function deleteWork(workId) {
+    const deleteUrl = `http://localhost:5678/api/works/${workId}`;
+    const token = sessionStorage.token;
+
+    try {
+        const response = await fetch(deleteUrl, {
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Erreur : ${response.status}`);
+        }
+
+        console.log(`Projet avec l'ID ${workId} supprimé avec succès.`);
+        worksData = worksData.filter(work => work.id !== parseInt(workId));
+        displayGalleryModal(worksData); 
+        displayGallery(worksData);
+
+    } catch (error) {
+        console.error("Erreur lors de la suppression :", error.message);
+        alert("Une erreur est survenue lors de la suppression. Veuillez réessayer.");
+    }
+}
+
+function showModal2() {
+    const btnAdd = document.querySelector(".addPhoto-modal")
+    const modal2 = document.querySelector(".modal-wrapper-2")
+    const modal1 = document.querySelector(".modal-wrapper")
+    btnAdd.addEventListener("click", function () {
+        modal2.style.display = "block";
+        modal1.style.display = "none";
+    });
+}
+
+showModal2()
+
+function previousModal() {
+    const previousArrow = document.querySelector(".js-previous-modal")
+    const modal2 = document.querySelector(".modal-wrapper-2")
+    const modal1 = document.querySelector(".modal-wrapper")
+    previousArrow.addEventListener("click", function () {
+        modal1.style.display = "block";
+        modal2.style.display = "none";
+    });
+}
+
+previousModal()

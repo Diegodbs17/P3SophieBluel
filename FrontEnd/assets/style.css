@@ -161,7 +161,7 @@ li:hover {
 	grid-row-gap: 20px;
 }
 
-.gallery img {
+.gallery img, .galleryModal img {
 	width: 100%;
 
 }
@@ -184,7 +184,7 @@ margin: auto;
 	flex-direction: column;
 }
 
-#contact input, .login-form input {
+#contact input, .login-form input, .addPhotoForm input {
 	height: 50px;
 	font-size: 1.2em;
 	border: none;
@@ -198,7 +198,7 @@ margin: auto;
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
 }
 
-input[type="submit"]{
+input[type="submit"] {
 	font-family: 'Syne';
 	font-weight: 700;
 	color: white;
@@ -256,6 +256,7 @@ footer nav ul {
 	color: white;
 	width: 100%;
 	top: 0;
+	right: 0;
 	left: 0;
 	padding: 20px 0;
 	text-align: center;
@@ -297,14 +298,17 @@ footer nav ul {
 	animation: fadeIn .3s both;
 }
 
-.modal-wrapper {
+.modal-wrapper, .modal-wrapper-2 {
 	background-color: white;
 	max-width: calc(100vw - 20px);
 	max-height: calc(100vh - 20px);
 	width: 600px;
-	padding: 20px;
+	padding: 65px;
 	overflow: auto;
 	animation: slideFromTop .5s both;
+	position: relative;
+	border-radius: 10px;
+	text-align: center;
 }
 
 .js-modal[aria-hidden="true"] {
@@ -333,4 +337,65 @@ footer nav ul {
 @keyframes slideToBot {
 	from { transform: translateY(0px); }
 	to { transform: translateY(50px); }
+}
+
+.js-close-modal {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	background: none;
+	font-size: 24px;
+}
+
+.js-previous-modal {
+	position: absolute;
+	top: 20px;
+	left: 20px;
+	background: none;
+	font-size: 24px;
+}
+
+.heading-modal {
+	font-family: 'Work Sans';
+	color: black;
+	font-weight: 500;
+	margin-top: 20px;
+}
+
+.galleryModal {
+	display: grid;
+	gap: 20px;
+	grid-template-columns: repeat(5, 1fr);
+	width: 100%;
+}
+
+.seperate-modal {
+	margin: 30px 0;
+}
+
+.addPhoto-modal {
+	font-family: 'Syne';
+	font-weight: 700;
+	background-color: #1D6154;
+	color: white;
+	text-align: center;
+	width: 237px;
+	height: 36px;
+	border-radius: 60px ;
+}
+
+.btn-trash {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	background-color: black;
+	color: white;
+	padding: 5px;
+}
+
+.addPhotoForm {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	text-align: left;
 }

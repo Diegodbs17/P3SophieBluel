@@ -22,7 +22,7 @@
 	<h1>Sophie Bluel <span>Architecte d'intérieur</span></h1>
 	<nav>
 		<ul>
-			<li>projets</li>
+			<li><a href="http://127.0.0.1:5500/Portfolio-architecte-sophie-bluel/FrontEnd/">projets</a></li>
 			<li>contact</li>
 			<li><a href="http://127.0.0.1:5500/Portfolio-architecte-sophie-bluel/FrontEnd/login.html" class="login-link">login</a></li>
 			<li><img src="./assets/icons/instagram.png" alt="Instagram"></li>
@@ -47,17 +47,25 @@
 		<div class="gallery"></div>
 		<aside id="modal1" class="js-modal" aria-hidden="true" role="dialog" aria-modal="false" aria-labelledby="title-modal" style="display: none;">
 			<div class="modal-wrapper js-modal-stop">
-				<button class="js-close-modal">X</button>
-				<h2 id="title-modal">Mes Projets</h2>
-				<p>Lorem ipsum odor amet, consectetuer adipiscing elit. Erat etiam diam quis nostra lobortis eleifend quam dapibus. Diam habitant rutrum maximus rhoncus accumsan sodales magna gravida. Elit inceptos potenti rhoncus montes aliquam tortor nullam. Curae torquent dignissim aptent curabitur fermentum. Lacus nascetur placerat fusce condimentum felis vel sociosqu neque amet? Ad turpis fringilla blandit suspendisse senectus neque ad. Inceptos ut penatibus nostra vitae porta maximus id.
-	
-					Mauris mauris aliquet tristique posuere odio netus himenaeos. Morbi fusce torquent curabitur sit sociosqu dignissim molestie felis. Senectus feugiat nullam varius condimentum fermentum eleifend. Bibendum nisi laoreet aliquet, fusce mus duis. At ornare magnis potenti nec libero ad sit ac. Magna varius suspendisse vitae varius dapibus enim augue elementum fringilla. Maximus vulputate vulputate tincidunt sagittis; vulputate feugiat litora molestie tortor. Erat cubilia ipsum; turpis curabitur vulputate quis. Sagittis tempus fermentum magna per odio hac cubilia.
-					
-					Et a accumsan elementum lacinia vitae mus augue. Aconsectetur ad est; placerat neque pharetra sociosqu natoque vehicula. Hac vitae pretium proin finibus fusce; porttitor adipiscing fermentum. Condimentum class elementum cubilia luctus libero magnis mi curae. Nulla platea massa proin natoque, at pharetra parturient habitant. Rhoncus commodo facilisi facilisi ullamcorper finibus tortor potenti. Feugiat nullam nisi est rhoncus et condimentum adipiscing vestibulum.
-					
-					Pulvinar cubilia nisi nunc nam at dignissim amet. Integer erat venenatis etiam diam, leo interdum tellus. Dignissim montes integer euismod consectetur vivamus mus orci vivamus. Imperdiet montes efficitur libero fames mattis imperdiet. Montes primis convallis commodo cubilia tellus. Tempus venenatis elit euismod; interdum ipsum eget.
-					
-					Porttitor lobortis rutrum dignissim platea condimentum dapibus dolor vestibulum. Consequat ante a vivamus montes tristique pretium. Erat ac blandit lacus nam cras luctus dictumst est porta. Suscipit posuere pellentesque arcu lacinia, vel tempor. Dis taciti erat tortor duis; ad himenaeos efficitur velit commodo. Posuere in vel urna parturient auctor senectus. Porta nisl blandit hendrerit quisque phasellus. Senectus magnis ut; quisque imperdiet accumsan nullam laoreet. Pulvinar sagittis rutrum ante, cursus mus eget. Sapien nascetur nunc fames pulvinar ornare habitant.</p>
+				<button class="js-close-modal"><i class="fa-solid fa-xmark"></i></button>
+				<h2 id="title-modal" class="heading-modal">Galerie photo</h2>
+				<div class="galleryModal"></div>
+				<hr class="seperate-modal">
+				<button class="addPhoto-modal">Ajouter une photo</button>
+			</div>
+			<div class="modal-wrapper-2 js-modal-stop">
+				<button class="js-close-modal"><i class="fa-solid fa-xmark"></i></button>
+				<button class="js-previous-modal"><i class="fa-solid fa-arrow-left"></i></button>
+				<h2 id="title-modal" class="heading-modal">Ajout photo</h2>
+				<form action="" class="addPhotoForm">
+					<input type="file" id="photo" name="photo" accept="image/png, image/jpeg" />
+					<label for="title">Titre</label>
+					<input type="text" name="title">
+					<label for="category">Catégorie</label>
+					<input type="select" name="category">
+					<hr class="seperate-modal">
+					<input type="submit" value="Valider">
+				</form>
 			</div>
 		</aside>
 	</section>
