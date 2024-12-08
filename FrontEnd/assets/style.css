@@ -184,7 +184,7 @@ margin: auto;
 	flex-direction: column;
 }
 
-#contact input, .login-form input, .addPhotoForm input {
+#contact input, .login-form input, .addPhotoForm input, select {
 	height: 50px;
 	font-size: 1.2em;
 	border: none;
@@ -398,4 +398,62 @@ footer nav ul {
 	flex-direction: column;
 	gap: 20px;
 	text-align: left;
+}
+
+.file-input {
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	background-color: #E8F1F6;
+	border-radius: 3px;
+	color: #B9C5CC;
+}
+
+.span-file {
+	font-size: 90px;
+	margin-top: 10px;
+}
+
+input[type="file"] {
+	height: 0;
+	width: 0;
+	overflow: hidden;
+}
+  
+input[type="file"] + label {
+	width: 173px;
+	padding: 15px 0;
+	font-family: 'Syne';
+	font-weight: 700;
+	color: #306685;
+	background-color: #CBD6DC;
+	text-align: center;
+	border-radius: 60px ;
+}
+
+.file-accepted {
+	color: #444444;
+	margin: 10px 0;
+}
+
+.addPhotoForm input[type="submit"] {
+	margin: 0 auto;
+}
+
+
+.file-preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.file-preview {
+    text-align: center;
+}
+
+.file-preview img {
+    max-width: 160px;
+    max-height: 100%;
+    display: block;
+    margin: 0 auto;
 }

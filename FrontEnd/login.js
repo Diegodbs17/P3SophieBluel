@@ -31,7 +31,7 @@ async function handleSubmit(event) {
         // Récupérer le token et rediriger si la requête réussit
         let result = await response.json();
         sessionStorage.setItem("token", result.token);
-        window.location.href = "http://127.0.0.1:5500/Portfolio-architecte-sophie-bluel/FrontEnd/";
+        window.location.href = "http://127.0.0.1:5500/index.html";
 
     } catch (error) {
         console.error("Erreur lors de la connexion :", error.message);

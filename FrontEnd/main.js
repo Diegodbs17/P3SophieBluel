@@ -16,6 +16,8 @@ async function getWorks() {
         setActiveButton(document.querySelector(".btn-all")); // Définit le bouton "Tous" comme actif
         displayGalleryModal(worksData);
         addDeleteEventListeners();
+        setupFileInputPreview()
+        getCategorySelect()
     } catch (error) {
         console.error("Erreur lors du chargement des travaux :", error.message); // Affiche l'erreur en console
     }
@@ -166,6 +168,15 @@ const closeModal = function (e) {
         modal2.style.display = "none";
         modal1.style.display = "block";
     }, "500");
+    const previewContainer = document.querySelector(".file-input"); // Conteneur pour les aperçus
+    previewContainer.innerHTML = `
+        <span class="span-file"><i class="fa-regular fa-image"></i></span>
+        <input type="file" id="file" name="file" accept="image/png, image/jpeg" />
+        <label for="file" class="label-file">+ Ajouter photo</label>
+        <span class="file-accepted">jpg, png : 4mo max</span>
+        <div class="file-preview-container"></div>
+    `;
+    setupFileInputPreview()
 }
 
 const deleteBtn = function (e) {
@@ -305,3 +316,50 @@ function previousModal() {
 }
 
 previousModal()
+
+// Récuperer les catégories
+function getCategorySelect() {
+    const inputSelect = document.querySelector(".category-input");
+    const categories = new Set();
+    worksData.forEach(work => {
+        if (work.category && work.category.name) {
+            categories.add(work.category.name);
+        }
+    });
+    inputSelect.innerHTML = "";
+    categories.forEach(category => {
+        const option = document.createElement("option");
+        option.value = category;
+        option.textContent = category;
+        inputSelect.appendChild(option);
+    });
+}
+
+// Afficher l'image seléctionné dans l'input file
+function setupFileInputPreview() {
+    const fileInput = document.querySelector("#file");
+    const previewContainer = document.querySelector(".file-input");
+    fileInput.addEventListener("change", () => {
+        previewContainer.innerHTML = "";
+        const files = Array.from(fileInput.files);
+        files.forEach((file) => {
+            const fileReader = new FileReader();
+            fileReader.onload = (e) => {
+                const previewElement = document.createElement("div");
+                previewElement.classList.add("file-preview");
+                if (file.type.startsWith("image/")) {
+                    const img = document.createElement("img");
+                    img.src = e.target.result; // URL de l'image
+                    img.alt = file.name;
+                    previewElement.appendChild(img);
+                } else {
+                    const text = document.createElement("p");
+                    text.textContent = `Fichier : ${file.name}`;
+                    previewElement.appendChild(text);
+                }
+                previewContainer.appendChild(previewElement);
+            };
+            fileReader.readAsDataURL(file); // Lire le contenu du fichier
+        });
+    });
+}
