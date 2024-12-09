@@ -1,32 +1,41 @@
-let worksData = []; // Une liste vide pour stocker toutes les travaux récupérées depuis l'API
+// Variables Globales
+
+let worksData = [];
+const worksUrl = "http://localhost:5678/api/works";
+const token = sessionStorage.token;
+
+// Appels Function Globales
+
+getWorks();
+showEditBanner()
+addDeleteEventListeners();
+showModal2()
+previousModal()
+getCategorySelect()
+newWork()
 
 // Fonction principale pour récupérer les travaux depuis l'API
 async function getWorks() {
-    const worksUrl = "http://localhost:5678/api/works"; // URL de l'API qui retourne les travaux
     try {
-        const response = await fetch(worksUrl); // On récupère les données avec fetch
+        const response = await fetch(worksUrl);
         if (!response.ok) {
-            // Si la réponse n'est pas "ok" (statut HTTP 200), on lance une erreur
             throw new Error(`Erreur : ${response.status}`);
         }
-
-        worksData = await response.json(); // Convertit les données JSON récupérées et les stock dans worksData
-        generateFilterButtons(); // Appelle une fonction pour créer dynamiquement les boutons de filtre
-        applyFilter("all"); // Affiche les travaux dès le chargement de la page
-        setActiveButton(document.querySelector(".btn-all")); // Définit le bouton "Tous" comme actif
+        worksData = await response.json();
+        generateFilterButtons();
+        applyFilter("all");
+        setActiveButton(document.querySelector(".btn-all"));
         displayGalleryModal(worksData);
-        addDeleteEventListeners();
-        setupFileInputPreview()
         getCategorySelect()
     } catch (error) {
-        console.error("Erreur lors du chargement des travaux :", error.message); // Affiche l'erreur en console
+        console.error("Erreur lors du chargement des travaux :", error.message);
     }
 }
 
 // Fonction pour générer dynamiquement les boutons de filtre
 function generateFilterButtons() {
     const filterContainer = document.querySelector(".filter-container");
-    filterContainer.innerHTML = ""; // Vide le conteneur
+    filterContainer.innerHTML = "";
 
     const categories = new Set();
     categories.add("Tous");
@@ -56,67 +65,57 @@ function generateFilterButtons() {
 
 // Fonction pour afficher les travaux filtrées
 function displayGallery(works) {
-    const gallery = document.querySelector(".gallery"); // Sélectionne la galerie dans le DOM
-    gallery.innerHTML = ""; // Vide la galerie avant d'afficher de nouvelles travaux
-
-    // Parcourt chaque travaux dans la liste et appelle la fonction createFigure pour l'afficher
+    const gallery = document.querySelector(".gallery");
+    gallery.innerHTML = "";
     works.forEach(createFigure);
 }
 
 // Fonction pour créer un élément <figure>
 function createFigure(work) {
-    const gallery = document.querySelector(".gallery"); // Sélectionne la galerie dans le DOM
-    const figure = document.createElement("figure"); // Crée un élément <figure>
+    const gallery = document.querySelector(".gallery");
+    const figure = document.createElement("figure");
     figure.innerHTML = `
-        <img src="${work.imageUrl}" alt="${work.title}"> <!-- Ajoute une image -->
-        <figcaption>${work.title}</figcaption> <!-- Ajoute un titre -->
+        <img src="${work.imageUrl}" alt="${work.title}">
+        <figcaption>${work.title}</figcaption>
     `;
-    gallery.appendChild(figure); // Ajoute le <figure> dans la galerie
+    gallery.appendChild(figure);
 }
 
 // Fonction pour appliquer un filtre basé sur une catégorie
 function applyFilter(category) {
-    // Si la catégorie est "all", on utilise toutes les travaux, sinon on filtre par catégorie
     const filteredWorks = category === "all"
-        ? worksData // Garde toutes les travaux si "all"
-        : worksData.filter(work => work.category.name === category); // Sinon, garde seulement celles de la catégorie
-
-    displayGallery(filteredWorks); // Affiche les travaux filtrés
+        ? worksData
+        : worksData.filter(work => work.category.name === category);
+    displayGallery(filteredWorks);
 }
 
 // Fonction pour mettre à jour le bouton actif
 function setActiveButton(activeButton) {
-    // Supprime la classe "active" de tous les boutons pour désactiver leur style
     document.querySelectorAll(".btn").forEach(button => {
         button.classList.remove("active");
     });
-
-    // Ajoute la classe "active" au bouton cliqué pour le mettre en focus
     activeButton.classList.add("active");
 }
 
-// Appelle la fonction principale pour récupérer et afficher les travaux dès le chargement de la page
-getWorks();
-
-
-// ADMIN
-
+// bannière Administrateur
 function showEditBanner() {
     if (sessionStorage.token !== undefined) {
         const editBanner = document.querySelector(".banner-editmode")
         const header = document.querySelector("header")
         const editBtn = document.querySelector(".edit-Btn")
         const loginBtn = document.querySelector(".login-link")
+        const filterContainer = document.querySelector(".filter-container")
+        const galleryWork = document.querySelector(".gallery")
         editBanner.style.display = 'block';
         editBtn.style.display = 'inline-block';
         header.classList.add("mgt-header");
         loginBtn.textContent = "logout"
+        filterContainer.style.display = "none"
+        galleryWork.style.marginTop = "85px"
     }
 }
 
-showEditBanner()
-
-// MODAL
+// Modal
 
 let modal = null
 const focusableSelector = "button, a, input, textarea"
@@ -124,32 +123,40 @@ let focusables = []
 let previouslyFocusedElement = null
 
 const openModal = function (e) {
-    e.preventDefault()
-    modal = document.querySelector(e.target.getAttribute("href"))
-    focusables = Array.from(modal.querySelector(focusableSelector))
-    previouslyFocusedElement = document.querySelector(":focus")
-    modal.style.display = null
-    //focusables[0].focus()
-    modal.removeAttribute("aria-hidden")
-    modal.setAttribute("aria-modal", "true")
-    modal.addEventListener("click", closeModal)
+    e.preventDefault();
+    modal = document.querySelector(e.target.getAttribute("href"));
+    focusables = Array.from(modal.querySelectorAll(focusableSelector));
+    previouslyFocusedElement = document.querySelector(":focus");
+    modal.style.display = null;
+    modal.removeAttribute("aria-hidden");
+    modal.setAttribute("aria-modal", "true");
+    modal.addEventListener("click", closeModal);
     modal.querySelectorAll(".js-close-modal").forEach((element) =>
         element.addEventListener("click", closeModal)
     );
     modal.querySelectorAll(".js-modal-stop").forEach((element) =>
         element.addEventListener("click", stopPropagation)
     );
-    const modal2 = document.querySelector(".modal-wrapper-2")
-    modal2.style.display = "none"
-}
+
+    // Réinitialiser l'état de fileInput
+    const fileInput = document.getElementById("file");
+    fileInput.value = ""; // Réinitialise le champ fichier
+
+    // Réinitialiser le conteneur d'images
+    resetImageContainer();
+
+    const modal2 = document.querySelector(".modal-wrapper-2");
+    modal2.style.display = "none";
+};
 
 const closeModal = function (e) {
     if (modal === null || !modal.contains(e.target)) return;
-    e.preventDefault()
-    if (previouslyFocusedElement !== null) previouslyFocusedElement.focus()
-    modal.setAttribute("aria-hidden", "true")
-    modal.removeAttribute("aria-modal")
-    modal.removeEventListener("click", closeModal)
+    e.preventDefault();
+    resetImageContainer(); // Réinitialise le conteneur d'images et réaffiche les "picture-loaded"
+    if (previouslyFocusedElement !== null) previouslyFocusedElement.focus();
+    modal.setAttribute("aria-hidden", "true");
+    modal.removeAttribute("aria-modal");
+    modal.removeEventListener("click", closeModal);
     modal.querySelectorAll(".js-close-modal").forEach((element) =>
         element.removeEventListener("click", closeModal)
     );
@@ -157,35 +164,25 @@ const closeModal = function (e) {
         element.removeEventListener("click", stopPropagation)
     );
     const hideModal = function () {
-        modal.style.display = "none"
-        modal.removeEventListener("animationend", hideModal)
-        modal = null
-    }
-    modal.addEventListener("animationend", hideModal)
-    const modal2 = document.querySelector(".modal-wrapper-2")
-    const modal1 = document.querySelector(".modal-wrapper")
+        modal.style.display = "none";
+        modal.removeEventListener("animationend", hideModal);
+        modal = null;
+    };
+    modal.addEventListener("animationend", hideModal);
+    const modal2 = document.querySelector(".modal-wrapper-2");
+    const modal1 = document.querySelector(".modal-wrapper");
     window.setTimeout(() => {
         modal2.style.display = "none";
         modal1.style.display = "block";
     }, "500");
-    const previewContainer = document.querySelector(".file-input"); // Conteneur pour les aperçus
-    previewContainer.innerHTML = `
-        <span class="span-file"><i class="fa-regular fa-image"></i></span>
-        <input type="file" id="file" name="file" accept="image/png, image/jpeg" />
-        <label for="file" class="label-file">+ Ajouter photo</label>
-        <span class="file-accepted">jpg, png : 4mo max</span>
-        <div class="file-preview-container"></div>
-    `;
-    setupFileInputPreview()
-}
+};
 
 const deleteBtn = function (e) {
     e.preventDefault();
-    //clicked button
     if (e.target.matches(".fa-trash-can")) {
       deleteWork(e.target.id);
     }
-  };
+};
 
 const stopPropagation = function (e) {
     e.stopPropagation()
@@ -221,16 +218,14 @@ window.addEventListener("keydown", function (e) {
     }
 });
 
-
+// Afficher les travaux dans la modale
 function displayGalleryModal(works) {
-    const galleryModal = document.querySelector(".galleryModal"); // Sélectionne la galerie dans le DOM
-    galleryModal.innerHTML = ""; // Vide la galerie avant d'afficher de nouvelles travaux
-
-    // Parcourt chaque travaux dans la liste et appelle la fonction createFigure pour l'afficher
+    const galleryModal = document.querySelector(".galleryModal");
+    galleryModal.innerHTML = "";
     works.forEach(createFigureModal);
 }
 
-
+// Créer les figures dans la modale
 function createFigureModal(work) {
     const galleryModal = document.querySelector(".galleryModal");
     const figureModal = document.createElement("figure");
@@ -242,7 +237,7 @@ function createFigureModal(work) {
     `;
     figureModal.style.position = "relative";
 
-    // Ajout direct de l'événement
+    // Ecoute sur le bouton Trash
     const deleteButton = figureModal.querySelector(".btn-trash");
     deleteButton.addEventListener("click", async (e) => {
         e.preventDefault(); // Important
@@ -250,26 +245,23 @@ function createFigureModal(work) {
         console.log("Suppression en cours pour l'ID :", workId);
         await deleteWork(workId);
     });
-
     galleryModal.appendChild(figureModal);
 }
 
+// Au clique sur le bouton trash ça delete un projet
 function addDeleteEventListeners() {
-    const deleteButtons = document.querySelectorAll(".btn-trash"); // Sélectionne tous les boutons trash
+    const deleteButtons = document.querySelectorAll(".btn-trash");
     deleteButtons.forEach(button => {
         button.addEventListener("click", async (event) => {
-            const workId = button.getAttribute("data-id"); // Récupère l'ID depuis l'attribut data-id
-            console.log("Bouton cliqué", workId); // Ajout d'un log ici
-            console.log(`Suppression du projet avec l'ID : ${workId}`);
-            await deleteWork(workId); // Appelle la fonction pour supprimer le projet
+            const workId = button.getAttribute("data-id");
+            await deleteWork(workId);
         });
     });
 }
 
+// Fonction DELETE
 async function deleteWork(workId) {
     const deleteUrl = `http://localhost:5678/api/works/${workId}`;
-    const token = sessionStorage.token;
-
     try {
         const response = await fetch(deleteUrl, {
             method: "DELETE",
@@ -277,22 +269,18 @@ async function deleteWork(workId) {
                 "Authorization": `Bearer ${token}`,
             }
         });
-
         if (!response.ok) {
             throw new Error(`Erreur : ${response.status}`);
         }
-
-        console.log(`Projet avec l'ID ${workId} supprimé avec succès.`);
         worksData = worksData.filter(work => work.id !== parseInt(workId));
         displayGalleryModal(worksData); 
         displayGallery(worksData);
-
     } catch (error) {
         console.error("Erreur lors de la suppression :", error.message);
-        alert("Une erreur est survenue lors de la suppression. Veuillez réessayer.");
     }
 }
 
+// Afficher la modale 2
 function showModal2() {
     const btnAdd = document.querySelector(".addPhoto-modal")
     const modal2 = document.querySelector(".modal-wrapper-2")
@@ -303,63 +291,203 @@ function showModal2() {
     });
 }
 
-showModal2()
-
+// Retourner en arrière avec la Arrow Left
 function previousModal() {
-    const previousArrow = document.querySelector(".js-previous-modal")
-    const modal2 = document.querySelector(".modal-wrapper-2")
-    const modal1 = document.querySelector(".modal-wrapper")
+    const previousArrow = document.querySelector(".js-previous-modal");
+    const modal2 = document.querySelector(".modal-wrapper-2");
+    const modal1 = document.querySelector(".modal-wrapper");
     previousArrow.addEventListener("click", function () {
+        resetImageContainer();
         modal1.style.display = "block";
         modal2.style.display = "none";
     });
 }
 
-previousModal()
-
-// Récuperer les catégories
 function getCategorySelect() {
-    const inputSelect = document.querySelector(".category-input");
+    const inputSelect = document.querySelector("#category");
+    inputSelect.innerHTML = "";
+
+    const defaultOption = document.createElement("option");
+    defaultOption.textContent = "Choisissez une catégorie";
+    defaultOption.value = "";
+    defaultOption.disabled = true;
+    defaultOption.selected = true;
+    inputSelect.appendChild(defaultOption);
+
     const categories = new Set();
+
     worksData.forEach(work => {
         if (work.category && work.category.name) {
-            categories.add(work.category.name);
+            categories.add(`${work.category.id}|${work.category.name}`);
         }
     });
-    inputSelect.innerHTML = "";
-    categories.forEach(category => {
+
+    categories.forEach(categoryString => {
+        const [id, name] = categoryString.split('|');
         const option = document.createElement("option");
-        option.value = category;
-        option.textContent = category;
+        option.value = id;
+        option.textContent = name;
         inputSelect.appendChild(option);
     });
 }
 
-// Afficher l'image seléctionné dans l'input file
-function setupFileInputPreview() {
-    const fileInput = document.querySelector("#file");
-    const previewContainer = document.querySelector(".file-input");
-    fileInput.addEventListener("change", () => {
-        previewContainer.innerHTML = "";
-        const files = Array.from(fileInput.files);
-        files.forEach((file) => {
-            const fileReader = new FileReader();
-            fileReader.onload = (e) => {
-                const previewElement = document.createElement("div");
-                previewElement.classList.add("file-preview");
-                if (file.type.startsWith("image/")) {
-                    const img = document.createElement("img");
-                    img.src = e.target.result; // URL de l'image
-                    img.alt = file.name;
-                    previewElement.appendChild(img);
-                } else {
-                    const text = document.createElement("p");
-                    text.textContent = `Fichier : ${file.name}`;
-                    previewElement.appendChild(text);
-                }
-                previewContainer.appendChild(previewElement);
+// Gestion de l'ajout d'une nouvelle photo
+function newWork() {
+    const img = document.createElement("img");
+    const fileInput = document.getElementById("file");
+    let file;
+    fileInput.style.display = "none";
+
+    getCategorySelect();
+
+    fileInput.addEventListener("change", function (event) {
+        file = event.target.files[0];
+        const maxFileSize = 4 * 1024 * 1024;
+    
+        if (file && (file.type === "image/jpeg" || file.type === "image/png")) {
+            if (file.size > maxFileSize) {
+                alert("La taille de l'image ne doit pas dépasser 4 Mo.");
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                // Vider le conteneur d'images pour éviter les doublons
+                const imgContainer = document.getElementById("img-container");
+                imgContainer.innerHTML = "";
+    
+                const img = document.createElement("img");
+                img.src = e.target.result;
+                img.alt = "Uploaded Photo";
+                imgContainer.appendChild(img);
             };
-            fileReader.readAsDataURL(file); // Lire le contenu du fichier
-        });
+            reader.readAsDataURL(file);
+    
+            // Cacher les éléments "picture-loaded"
+            document.querySelectorAll(".picture-loaded").forEach((e) => (e.style.display = "none"));
+        } else {
+            alert("Veuillez sélectionner une image au format JPG ou PNG.");
+        }
+    });
+
+    const titleInput = document.getElementById("title");
+    const categorySelect = document.getElementById("category");
+    let titleValue = "";
+    let selectedValue = null;
+
+    titleInput.addEventListener("input", function () {
+        titleValue = titleInput.value;
+        checkFormValidity(); // Vérifie l'état du formulaire à chaque modification
+    });
+
+    categorySelect.addEventListener("change", function () {
+        selectedValue = categorySelect.value;
+        checkFormValidity(); // Vérifie l'état du formulaire à chaque modification
+    });
+
+    const addPictureForm = document.getElementById("addPhotoForm");
+    const submitButton = addPictureForm.querySelector("input[type='submit']");
+
+    // Fonction de validation des champs
+    function validateTitle() {
+        const titleError = document.getElementById("title-error");
+        if (!titleValue) {
+            titleError.textContent = "Le titre est requis.";
+            return false;
+        }
+        titleError.textContent = "";
+        return true;
+    }
+
+    function validateCategory() {
+        const categoryError = document.getElementById("category-error");
+        if (!selectedValue) {
+            categoryError.textContent = "La catégorie est requise.";
+            return false;
+        }
+        categoryError.textContent = "";
+        return true;
+    }
+
+    function validateImage() {
+        const imageError = document.querySelector(".image-error");
+        const hasImage = document.querySelector("#img-container").firstChild;
+        if (!hasImage) {
+            imageError.textContent = "L'image est requise.";
+            return false;
+        }
+        imageError.textContent = "";
+        return true;
+    }
+
+    // Fonction pour vérifier si tous les champs sont valides
+    function checkFormValidity() {
+        const isTitleValid = validateTitle();
+        const isCategoryValid = validateCategory();
+        const isImageValid = validateImage();
+
+        // Si tous les champs sont valides, active le bouton
+        if (isTitleValid && isCategoryValid && isImageValid) {
+            submitButton.style.backgroundColor = "black"; // Fond noir
+            submitButton.disabled = false; // Active le bouton
+        } else {
+            submitButton.style.backgroundColor = "gray"; // Fond gris
+            submitButton.disabled = true; // Désactive le bouton
+        }
+    }
+
+    // Gérer l'envoi du formulaire
+    addPictureForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        // Valider les champs avant de soumettre
+        const isTitleValid = validateTitle();
+        const isCategoryValid = validateCategory();
+        const isImageValid = validateImage();
+
+        if (isTitleValid && isCategoryValid && isImageValid) {
+            const formData = new FormData();
+
+            formData.append("image", file);
+            formData.append("title", titleValue);
+            formData.append("category", selectedValue);
+
+            try {
+                const response = await fetch("http://localhost:5678/api/works", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                    },
+                    body: formData,
+                });
+
+                if (response.status === 201) {
+                    const data = await response.json();
+                    console.log("Œuvre ajoutée avec succès :", data);
+                    alert("Projet ajoutée !");
+                    location.reload();
+                } else {
+                    const errorText = await response.text();
+                    console.error("Erreur :", errorText);
+                    alert(`Erreur lors de l'ajout du projet : ${errorText}`);
+                }
+            } catch (error) {
+                console.error("Erreur réseau :", error.message);
+                alert("Une erreur réseau s'est produite.");
+            }
+        } else {
+            console.error("Tous les champs doivent être remplis correctement.");
+            alert("Veuillez remplir tous les champs.");
+        }
+    });
+}
+
+function resetImageContainer() {
+    // Vider le conteneur d'images uniquement si des enfants existent
+    const imgContainer = document.getElementById("img-container");
+    imgContainer.innerHTML = "";
+
+    // Réafficher les éléments avec la classe "picture-loaded"
+    document.querySelectorAll(".picture-loaded").forEach((element) => {
+        element.style.display = "block";
     });
 }
