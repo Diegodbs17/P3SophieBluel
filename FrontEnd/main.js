@@ -8,7 +8,6 @@ const token = sessionStorage.token;
 
 getWorks();
 showEditBanner()
-addDeleteEventListeners();
 showModal2()
 previousModal()
 getCategorySelect()
@@ -137,14 +136,6 @@ const openModal = function (e) {
     modal.querySelectorAll(".js-modal-stop").forEach((element) =>
         element.addEventListener("click", stopPropagation)
     );
-
-    // Réinitialiser l'état de fileInput
-    const fileInput = document.getElementById("file");
-    fileInput.value = ""; // Réinitialise le champ fichier
-
-    // Réinitialiser le conteneur d'images
-    resetImageContainer();
-
     const modal2 = document.querySelector(".modal-wrapper-2");
     modal2.style.display = "none";
 };
@@ -152,7 +143,7 @@ const openModal = function (e) {
 const closeModal = function (e) {
     if (modal === null || !modal.contains(e.target)) return;
     e.preventDefault();
-    resetImageContainer(); // Réinitialise le conteneur d'images et réaffiche les "picture-loaded"
+
     if (previouslyFocusedElement !== null) previouslyFocusedElement.focus();
     modal.setAttribute("aria-hidden", "true");
     modal.removeAttribute("aria-modal");
@@ -175,6 +166,7 @@ const closeModal = function (e) {
         modal2.style.display = "none";
         modal1.style.display = "block";
     }, "500");
+    resetForm()
 };
 
 const deleteBtn = function (e) {
@@ -240,23 +232,11 @@ function createFigureModal(work) {
     // Ecoute sur le bouton Trash
     const deleteButton = figureModal.querySelector(".btn-trash");
     deleteButton.addEventListener("click", async (e) => {
-        e.preventDefault(); // Important
+        e.preventDefault();
         const workId = deleteButton.getAttribute("data-id");
-        console.log("Suppression en cours pour l'ID :", workId);
         await deleteWork(workId);
     });
     galleryModal.appendChild(figureModal);
-}
-
-// Au clique sur le bouton trash ça delete un projet
-function addDeleteEventListeners() {
-    const deleteButtons = document.querySelectorAll(".btn-trash");
-    deleteButtons.forEach(button => {
-        button.addEventListener("click", async (event) => {
-            const workId = button.getAttribute("data-id");
-            await deleteWork(workId);
-        });
-    });
 }
 
 // Fonction DELETE
@@ -297,12 +277,13 @@ function previousModal() {
     const modal2 = document.querySelector(".modal-wrapper-2");
     const modal1 = document.querySelector(".modal-wrapper");
     previousArrow.addEventListener("click", function () {
-        resetImageContainer();
         modal1.style.display = "block";
         modal2.style.display = "none";
+        resetForm()
     });
 }
 
+// Recupère les catégory pour l'input Select
 function getCategorySelect() {
     const inputSelect = document.querySelector("#category");
     inputSelect.innerHTML = "";
@@ -333,7 +314,6 @@ function getCategorySelect() {
 
 // Gestion de l'ajout d'une nouvelle photo
 function newWork() {
-    const img = document.createElement("img");
     const fileInput = document.getElementById("file");
     let file;
     fileInput.style.display = "none";
@@ -343,7 +323,7 @@ function newWork() {
     fileInput.addEventListener("change", function (event) {
         file = event.target.files[0];
         const maxFileSize = 4 * 1024 * 1024;
-    
+
         if (file && (file.type === "image/jpeg" || file.type === "image/png")) {
             if (file.size > maxFileSize) {
                 alert("La taille de l'image ne doit pas dépasser 4 Mo.");
@@ -351,143 +331,108 @@ function newWork() {
             }
             const reader = new FileReader();
             reader.onload = (e) => {
-                // Vider le conteneur d'images pour éviter les doublons
+                const titleInput = document.getElementById("title");
                 const imgContainer = document.getElementById("img-container");
                 imgContainer.innerHTML = "";
-    
+
                 const img = document.createElement("img");
                 img.src = e.target.result;
-                img.alt = "Uploaded Photo";
+                img.alt = titleInput;
                 imgContainer.appendChild(img);
             };
             reader.readAsDataURL(file);
-    
-            // Cacher les éléments "picture-loaded"
-            document.querySelectorAll(".picture-loaded").forEach((e) => (e.style.display = "none"));
+            document.querySelectorAll(".imgOnContainer").forEach((e) => (e.style.display = "none"));
         } else {
             alert("Veuillez sélectionner une image au format JPG ou PNG.");
         }
     });
 
-    const titleInput = document.getElementById("title");
-    const categorySelect = document.getElementById("category");
-    let titleValue = "";
-    let selectedValue = null;
-
-    titleInput.addEventListener("input", function () {
-        titleValue = titleInput.value;
-        checkFormValidity(); // Vérifie l'état du formulaire à chaque modification
-    });
-
-    categorySelect.addEventListener("change", function () {
-        selectedValue = categorySelect.value;
-        checkFormValidity(); // Vérifie l'état du formulaire à chaque modification
-    });
-
     const addPictureForm = document.getElementById("addPhotoForm");
-    const submitButton = addPictureForm.querySelector("input[type='submit']");
 
-    // Fonction de validation des champs
-    function validateTitle() {
-        const titleError = document.getElementById("title-error");
-        if (!titleValue) {
-            titleError.textContent = "Le titre est requis.";
-            return false;
-        }
-        titleError.textContent = "";
-        return true;
-    }
-
-    function validateCategory() {
-        const categoryError = document.getElementById("category-error");
-        if (!selectedValue) {
-            categoryError.textContent = "La catégorie est requise.";
-            return false;
-        }
-        categoryError.textContent = "";
-        return true;
-    }
-
-    function validateImage() {
-        const imageError = document.querySelector(".image-error");
-        const hasImage = document.querySelector("#img-container").firstChild;
-        if (!hasImage) {
-            imageError.textContent = "L'image est requise.";
-            return false;
-        }
-        imageError.textContent = "";
-        return true;
-    }
-
-    // Fonction pour vérifier si tous les champs sont valides
+    // Ajoute une fonction pour vérifier les champs du formulaire
     function checkFormValidity() {
-        const isTitleValid = validateTitle();
-        const isCategoryValid = validateCategory();
-        const isImageValid = validateImage();
+        const titleInput = document.getElementById("title");
+        const categoryInput = document.getElementById("category");
+        const submitButton = document.querySelector(".btnSubForm");
+        const fileInput = document.getElementById("file");
 
-        // Si tous les champs sont valides, active le bouton
-        if (isTitleValid && isCategoryValid && isImageValid) {
-            submitButton.style.backgroundColor = "black"; // Fond noir
-            submitButton.disabled = false; // Active le bouton
+        // Vérifier si tous les champs sont remplis
+        if (titleInput.value !== "" && fileInput.files[0] && categoryInput.value !== "") {
+            submitButton.style.backgroundColor = "#1D6154";
         } else {
-            submitButton.style.backgroundColor = "gray"; // Fond gris
-            submitButton.disabled = true; // Désactive le bouton
+            submitButton.style.backgroundColor = "#A7A7A7";
         }
     }
 
-    // Gérer l'envoi du formulaire
-    addPictureForm.addEventListener("submit", async (event) => {
+    // Fonction pour gérer les erreurs d'entrée
+    function errorInput(event) {
+        const titleInput = document.getElementById("title");
+        const categoryInput = document.getElementById("category");
+        const fileInput = document.getElementById("file");
+        const error = document.querySelector(".errorInput")
+
+        // Vérifier si les champs sont vides et afficher un message dans la console
+        if (titleInput.value === "" || !fileInput.files[0] || categoryInput.value === "") {
+            event.preventDefault();
+            error.style.display = "block"
+        }
+    }
+
+    // Vérification des champs à chaque modification
+    document.getElementById("title").addEventListener("input", checkFormValidity);
+    document.getElementById("category").addEventListener("change", checkFormValidity);
+    document.getElementById("file").addEventListener("change", checkFormValidity);
+    document.querySelector(".addPhotoForm").addEventListener("submit", errorInput);
+
+    checkFormValidity();
+
+    addPictureForm.addEventListener("submit", async function (event) {
         event.preventDefault();
+        const titleInput = document.getElementById("title");
+        const categoryInput = document.getElementById("category");
 
-        // Valider les champs avant de soumettre
-        const isTitleValid = validateTitle();
-        const isCategoryValid = validateCategory();
-        const isImageValid = validateImage();
+        // Créer un nouvel objet FormData
+        const formData = new FormData();
+        formData.append("title", titleInput.value);
+        formData.append("category", categoryInput.value);
+        formData.append("image", file);
 
-        if (isTitleValid && isCategoryValid && isImageValid) {
-            const formData = new FormData();
+        try {
+            const response = await fetch(worksUrl, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: formData,
+            });
 
-            formData.append("image", file);
-            formData.append("title", titleValue);
-            formData.append("category", selectedValue);
-
-            try {
-                const response = await fetch("http://localhost:5678/api/works", {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                    },
-                    body: formData,
-                });
-
-                if (response.status === 201) {
-                    const data = await response.json();
-                    console.log("Œuvre ajoutée avec succès :", data);
-                    alert("Projet ajoutée !");
-                    location.reload();
-                } else {
-                    const errorText = await response.text();
-                    console.error("Erreur :", errorText);
-                    alert(`Erreur lors de l'ajout du projet : ${errorText}`);
-                }
-            } catch (error) {
-                console.error("Erreur réseau :", error.message);
-                alert("Une erreur réseau s'est produite.");
+            if (response.ok) {
+                const newWorkData = await response.json();
+                worksData.push(newWorkData);
+                displayGalleryModal(worksData);
+                displayGallery(worksData);
+                alert("Projet Publié");
+                const error = document.querySelector(".errorInput")
+                resetForm()
+            } else {
+                console.error("Erreur lors de l'ajout du nouveau projet");
             }
-        } else {
-            console.error("Tous les champs doivent être remplis correctement.");
-            alert("Veuillez remplir tous les champs.");
+        } catch (error) {
+            console.error("Erreur lors de l'envoi des données", error);
         }
     });
 }
 
-function resetImageContainer() {
-    // Vider le conteneur d'images uniquement si des enfants existent
-    const imgContainer = document.getElementById("img-container");
-    imgContainer.innerHTML = "";
-
-    // Réafficher les éléments avec la classe "picture-loaded"
-    document.querySelectorAll(".picture-loaded").forEach((element) => {
-        element.style.display = "block";
-    });
+// Reset Formulaire
+function resetForm() {
+    const form = document.querySelector(".addPhotoForm")
+    form.reset()
+    document.getElementById("img-container").innerHTML = '';
+    document.querySelectorAll(".imgOnContainer").forEach((e) => (e.style.display = "block"));
+    const categorySelect = document.getElementById("category");
+    categorySelect.value = "";
+    const error = document.querySelector(".errorInput")
+    error.style.display = "none"
+    const submitButton = document.querySelector(".btnSubForm");
+    submitButton.style.backgroundColor = "#A7A7A7";
 }

@@ -442,13 +442,13 @@ input[type="file"] {
 }
 
 #img-container img {
-    width: 350px;
+    width: 200px;
     display: block;
     margin: 0 auto;
 }
 
-.error-message {
-    color: red;
-    font-size: 12px;
-    margin-top: 5px;
+.errorInput {
+	display: none;
+	color: red;
+	text-align: center;
 }
