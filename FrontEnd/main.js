@@ -82,9 +82,9 @@ function createFigure(work) {
 
 // Fonction pour appliquer un filtre basé sur une catégorie
 function applyFilter(category) {
-    const filteredWorks = category === "all"
-        ? worksData
-        : worksData.filter(work => work.category.name === category);
+    const filteredWorks = category === "all" ?
+        worksData :
+        worksData.filter(work => work.category.name === category);
     displayGallery(filteredWorks);
 }
 
@@ -121,7 +121,7 @@ const focusableSelector = "button, a, input, textarea"
 let focusables = []
 let previouslyFocusedElement = null
 
-const openModal = function (e) {
+const openModal = function(e) {
     e.preventDefault();
     modal = document.querySelector(e.target.getAttribute("href"));
     focusables = Array.from(modal.querySelectorAll(focusableSelector));
@@ -140,7 +140,7 @@ const openModal = function (e) {
     modal2.style.display = "none";
 };
 
-const closeModal = function (e) {
+const closeModal = function(e) {
     if (modal === null || !modal.contains(e.target)) return;
     e.preventDefault();
 
@@ -154,7 +154,7 @@ const closeModal = function (e) {
     modal.querySelectorAll(".js-modal-stop").forEach((element) =>
         element.removeEventListener("click", stopPropagation)
     );
-    const hideModal = function () {
+    const hideModal = function() {
         modal.style.display = "none";
         modal.removeEventListener("animationend", hideModal);
         modal = null;
@@ -169,21 +169,21 @@ const closeModal = function (e) {
     resetForm()
 };
 
-const deleteBtn = function (e) {
+const deleteBtn = function(e) {
     e.preventDefault();
     if (e.target.matches(".fa-trash-can")) {
-      deleteWork(e.target.id);
+        deleteWork(e.target.id);
     }
 };
 
-const stopPropagation = function (e) {
+const stopPropagation = function(e) {
     e.stopPropagation()
 }
 
-const focusInModal = function (e) {
+const focusInModal = function(e) {
     e.preventDefault()
     let index = focusables.findIndex(f => f === modal.querySelector(":focus"))
-    if (e.shiftKey === true ) {
+    if (e.shiftKey === true) {
         index--
     } else {
         index++
@@ -201,7 +201,7 @@ document.querySelectorAll(".modal").forEach(a => {
     a.addEventListener("click", openModal)
 })
 
-window.addEventListener("keydown", function (e) {
+window.addEventListener("keydown", function(e) {
     if (e.key === "Escape") {
         closeModal(e);
     }
@@ -253,7 +253,7 @@ async function deleteWork(workId) {
             throw new Error(`Erreur : ${response.status}`);
         }
         worksData = worksData.filter(work => work.id !== parseInt(workId));
-        displayGalleryModal(worksData); 
+        displayGalleryModal(worksData);
         displayGallery(worksData);
     } catch (error) {
         console.error("Erreur lors de la suppression :", error.message);
@@ -265,7 +265,7 @@ function showModal2() {
     const btnAdd = document.querySelector(".addPhoto-modal")
     const modal2 = document.querySelector(".modal-wrapper-2")
     const modal1 = document.querySelector(".modal-wrapper")
-    btnAdd.addEventListener("click", function () {
+    btnAdd.addEventListener("click", function() {
         modal2.style.display = "block";
         modal1.style.display = "none";
     });
@@ -276,7 +276,7 @@ function previousModal() {
     const previousArrow = document.querySelector(".js-previous-modal");
     const modal2 = document.querySelector(".modal-wrapper-2");
     const modal1 = document.querySelector(".modal-wrapper");
-    previousArrow.addEventListener("click", function () {
+    previousArrow.addEventListener("click", function() {
         modal1.style.display = "block";
         modal2.style.display = "none";
         resetForm()
@@ -320,7 +320,7 @@ function newWork() {
 
     getCategorySelect();
 
-    fileInput.addEventListener("change", function (event) {
+    fileInput.addEventListener("change", function(event) {
         file = event.target.files[0];
         const maxFileSize = 4 * 1024 * 1024;
 
@@ -386,7 +386,7 @@ function newWork() {
 
     checkFormValidity();
 
-    addPictureForm.addEventListener("submit", async function (event) {
+    addPictureForm.addEventListener("submit", async function(event) {
         event.preventDefault();
         const titleInput = document.getElementById("title");
         const categoryInput = document.getElementById("category");

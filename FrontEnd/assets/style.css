@@ -244,6 +244,7 @@ footer nav ul {
 
 .forgetpassword {
 	color: #3D3D3D;
+	text-decoration: underline;
 }
 
 /** Banner edit mode **/
@@ -451,4 +452,8 @@ input[type="file"] {
 	display: none;
 	color: red;
 	text-align: center;
+}
+
+#title, #category {
+	padding: 0 10px;
 }

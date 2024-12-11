@@ -1,12 +1,9 @@
 const loginUrl = "http://localhost:5678/api/users/login";
 
-// Ajouter un écouteur d'événements sur le formulaire
 document.querySelector(".login-form").addEventListener("submit", handleSubmit);
 
 async function handleSubmit(event) {
-    event.preventDefault(); // Empêche le rechargement de la page
-
-    // Récupérer les données de l'utilisateur depuis les champs de formulaire
+    event.preventDefault();
     let user = {
         email: document.getElementById("email").value,
         password: document.getElementById("password").value
@@ -25,10 +22,8 @@ async function handleSubmit(event) {
         // Vérifier si la requête a échoué
         if (!response.ok) {
             showError("Identifiants incorrects. Veuillez réessayer.");
-            return; // Arrêter l'exécution de la fonction en cas d'erreur
+            return;
         }
-
-        // Récupérer le token et rediriger si la requête réussit
         let result = await response.json();
         sessionStorage.setItem("token", result.token);
         window.location.href = "http://127.0.0.1:5500/index.html";
@@ -41,15 +36,11 @@ async function handleSubmit(event) {
 
 // Fonction pour afficher un message d'erreur
 function showError(message) {
-    let errorDiv = document.querySelector(".errorDiv"); // Rechercher un élément existant
-
-    // Si l'élément n'existe pas, le créer
+    let errorDiv = document.querySelector(".errorDiv");
     if (!errorDiv) {
         errorDiv = document.createElement("div");
-        errorDiv.className = "errorDiv"; // Définir la classe
-        document.querySelector(".login-form").appendChild(errorDiv); // Ajouter au formulaire
+        errorDiv.className = "errorDiv";
+        document.querySelector(".login-form").appendChild(errorDiv);
     }
-
-    // Ajouter le message d'erreur
     errorDiv.textContent = message;
 }
